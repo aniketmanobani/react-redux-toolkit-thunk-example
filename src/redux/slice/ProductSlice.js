@@ -1,11 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { FetchProductsAsync } from "../middleware/ProductMiddleware";
+import {
+  AddProductsAsync,
+  FetchProductsAsync,
+} from "../middleware/ProductMiddleware";
 
 const initialState = {
   products: [],
   isLoading: false,
   status: "idle", // idle, loading, success, failed
   error: null,
+  addProduct: {
+    isLoading: false,
+    status: "idle",
+    error: null,
+    data: null,
+  },
 };
 
 const ProductSlice = createSlice({
@@ -19,6 +28,17 @@ const ProductSlice = createSlice({
         status: "idle",
         error: null,
         products: [],
+      };
+    },
+    resetAddProduct(state) {
+      return {
+        ...state,
+        addProduct: {
+          isLoading: false,
+          status: "idle",
+          error: null,
+          data: null,
+        },
       };
     },
   },
@@ -42,6 +62,27 @@ const ProductSlice = createSlice({
       state.error = action.payload;
       state.status = "failed";
       state.products = [];
+    });
+
+    // add product
+    builder.addCase(AddProductsAsync.pending, (state) => {
+      state.addProduct.data = null;
+      state.addProduct.error = null;
+      state.addProduct.isLoading = true;
+      state.addProduct.status = "pending";
+    });
+
+    builder.addCase(AddProductsAsync.fulfilled, (state, action) => {
+      state.addProduct.data = action.payload;
+      state.addProduct.error = null;
+      state.addProduct.isLoading = false;
+      state.addProduct.status = "success";
+    });
+    builder.addCase(AddProductsAsync.rejected, (state, action) => {
+      state.addProduct.data = null;
+      state.addProduct.error = action.payload;
+      state.addProduct.isLoading = false;
+      state.addProduct.status = "rejected";
     });
   },
 });
