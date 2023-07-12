@@ -9,7 +9,9 @@ function Products() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(FetchProductsAsync());
+    const c = dispatch(FetchProductsAsync());
+
+    return () => c.abort();
   }, []);
 
   return (
